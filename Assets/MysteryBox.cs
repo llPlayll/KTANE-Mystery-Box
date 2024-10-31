@@ -261,7 +261,7 @@ public class MysteryBox : MonoBehaviour
         isAnimating = true;
         BoxLight.gameObject.SetActive(false);
         ColourblindText.gameObject.SetActive(false);
-
+        Weapon.gameObject.SetActive(!solve);
         for (int i = 0; i < 20; i++)
         {
             Weapon.transform.localPosition -= new Vector3(0, 0, 0.068f / 20);
@@ -286,7 +286,7 @@ public class MysteryBox : MonoBehaviour
             Box.gameObject.transform.Rotate(10, 0, 0);
             yield return null;
         }
-        Weapon.gameObject.SetActive(false);
+        
         Box.gameObject.SetActive(false);
     }
 
