@@ -1,0 +1,10 @@
+{
+  "name": "mysteryBox-Editor",
+  "references": [
+    "mysteryBox"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}
