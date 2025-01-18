@@ -19,6 +19,7 @@ public class MysteryBox : MonoBehaviour
     [SerializeField] TextMesh ColourblindText;
     [SerializeField] TextMesh WeaponText;
     [SerializeField] GameObject Weapon;
+    [SerializeField] GameObject WeaponHL;
     [SerializeField] MeshRenderer WeaponRenderer;
     [SerializeField] List<Material> WeaponMaterials;
     [SerializeField] List<Material> WonderWeaponMaterials;
@@ -207,6 +208,7 @@ public class MysteryBox : MonoBehaviour
         rolls++;
         weaponAvailable = true;
         isAnimating = false;
+        WeaponHL.SetActive(true);
         if (Rnd.Range(0, 100) == 0)
         {
             int wonderIdx = Rnd.Range(0, 5);
@@ -239,6 +241,7 @@ public class MysteryBox : MonoBehaviour
     IEnumerator OpenBox()
     {
         isAnimating = true;
+        WeaponHL.SetActive(false);
         BoxLight.gameObject.SetActive(true);
         ColourblindText.gameObject.SetActive(Colourblind.ColorblindModeActive);
         Audio.PlaySoundAtTransform(MusicBox.name, transform);
@@ -259,6 +262,7 @@ public class MysteryBox : MonoBehaviour
     IEnumerator CloseBox()
     {
         isAnimating = true;
+        WeaponHL.SetActive(false);
         BoxLight.gameObject.SetActive(false);
         ColourblindText.gameObject.SetActive(false);
         Weapon.gameObject.SetActive(!ModuleSolved);
