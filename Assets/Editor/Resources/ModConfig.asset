@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: mysteryBox
   title: Mystery Box
-  author: 
+  author: _Play_
   description: 'Fetch me their souls!!!!!
 
 
@@ -23,6 +23,6 @@ MonoBehaviour:
     Developed by _Play_
 
     Idea by TheBigBadBull'
-  version: 0.1
+  version: 0.2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 378e3da8401674d46baa2c96e0a5d59c, type: 3}
