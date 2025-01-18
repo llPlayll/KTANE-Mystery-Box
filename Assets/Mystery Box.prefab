@@ -2718,10 +2718,20 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 890cc69f354c74d43841b9599b348418, type: 2}
   - {fileID: 2100000, guid: 665992ba20726d841850c5365681d2a5, type: 2}
   - {fileID: 2100000, guid: ebbe4cdcc380feb42b6d7f092a930617, type: 2}
-  OpenSound: {fileID: 8300000, guid: 5eac5fdcdd4e49d4ebac2b35fa4a9fdb, type: 3}
-  StartupSound: {fileID: 8300000, guid: 893c5a9e17706e44d8c89547c807499b, type: 3}
-  SolveSound: {fileID: 8300000, guid: e099a82e3dbb852479e4b60073f06bdf, type: 3}
   SolveSprite: {fileID: 1020603888368646}
+  StartupSound: {fileID: 8300000, guid: 893c5a9e17706e44d8c89547c807499b, type: 3}
+  MusicBox: {fileID: 8300000, guid: 5eac5fdcdd4e49d4ebac2b35fa4a9fdb, type: 3}
+  SolveSound: {fileID: 8300000, guid: e099a82e3dbb852479e4b60073f06bdf, type: 3}
+  OpenSound: {fileID: 8300000, guid: f1730addcce06af42a60aa333d32339f, type: 3}
+  CloseSound: {fileID: 8300000, guid: 288573209fbd7e044af589954a074e56, type: 3}
+  EquipSound: {fileID: 8300000, guid: 965798c85753bee4a9e541c1dce0c61e, type: 3}
+  StrikeSounds:
+  - {fileID: 8300000, guid: 009db3ee4f363144ba6aec028a953aa6, type: 3}
+  - {fileID: 8300000, guid: 8403fca190fbcee45826836e4ed8d095, type: 3}
+  - {fileID: 8300000, guid: 74685aec1228b624b835ca10b552c5bb, type: 3}
+  - {fileID: 8300000, guid: c9eb0e8d72244f24d8279571da0e325e, type: 3}
+  - {fileID: 8300000, guid: fe625a50088d24248ac432181446ab1b, type: 3}
+  - {fileID: 8300000, guid: a0af613c14df9fa4a8e574afa7d74ff3, type: 3}
 --- !u!114 &114362825312973198
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -22,10 +22,15 @@ public class MysteryBox : MonoBehaviour
     [SerializeField] MeshRenderer WeaponRenderer;
     [SerializeField] List<Material> WeaponMaterials;
     [SerializeField] List<Material> WonderWeaponMaterials;
-    [SerializeField] AudioClip OpenSound;
-    [SerializeField] AudioClip StartupSound;
-    [SerializeField] AudioClip SolveSound;
     [SerializeField] GameObject SolveSprite;
+    [SerializeField] AudioClip StartupSound;
+    [SerializeField] AudioClip MusicBox;
+    [SerializeField] AudioClip SolveSound;
+    [SerializeField] AudioClip OpenSound;
+    [SerializeField] AudioClip CloseSound;
+    [SerializeField] AudioClip EquipSound;
+    [SerializeField] List<AudioClip> StrikeSounds;
+    
 
     static int ModuleIdCounter = 1;
     int ModuleId;
@@ -109,29 +114,21 @@ public class MysteryBox : MonoBehaviour
         rolls = 0;
         if (curWeapon >= 100)
         {
+            Audio.PlaySoundAtTransform(EquipSound.name, transform);
             GetComponent<KMBombModule>().HandlePass();
             Log(String.Format("Picked up {0}, which is a wonder weapon! Module solved!", rolledWeaponName));
             ModuleSolved = true;
+            StartCoroutine("CloseBox");
         }
         else if (curWeapon == goalWeapon)
         {
+            Audio.PlaySoundAtTransform(EquipSound.name, transform);
             GetComponent<KMBombModule>().HandlePass();
             Log(String.Format("Picked up {0}, which is the goal weapon. Module solved!", rolledWeaponName));
             ModuleSolved = true;
+            StartCoroutine("CloseBox");
         }
-        else
-        {
-            GetComponent<KMBombModule>().HandleStrike();
-            boxColour = Rnd.Range(0, 10);
-            BoxLight.color = lightColours[boxColour];
-            ColourblindText.text = colourNames[boxColour];
-            goalWeapon = weaponsTable[(int)Math.Floor((x - 1.0) / 10), boxColour];
-            guaranteedRoll = Rnd.Range(6, 9);
-
-            Log(String.Format("Tried to pick up the {0}, but it wasn't the goal weapon. Strike! Regenerating the module...", rolledWeaponName));
-            Log(String.Format("Mystery Box colour is now {0}, and the goal weapon is the {1}.", colourNames[boxColour], WeaponMaterials[goalWeapon].name));
-        }
-        StartCoroutine("CloseBox", ModuleSolved);
+        else StartCoroutine("Strike");
     }
 
     void Start()
@@ -244,6 +241,7 @@ public class MysteryBox : MonoBehaviour
         isAnimating = true;
         BoxLight.gameObject.SetActive(true);
         ColourblindText.gameObject.SetActive(Colourblind.ColorblindModeActive);
+        Audio.PlaySoundAtTransform(MusicBox.name, transform);
 
         for (int i = 0; i < 35; i++)
         {
@@ -258,12 +256,14 @@ public class MysteryBox : MonoBehaviour
         }
     }
 
-    IEnumerator CloseBox(bool solve)
+    IEnumerator CloseBox()
     {
         isAnimating = true;
         BoxLight.gameObject.SetActive(false);
         ColourblindText.gameObject.SetActive(false);
-        Weapon.gameObject.SetActive(!solve);
+        Weapon.gameObject.SetActive(!ModuleSolved);
+        Audio.PlaySoundAtTransform(CloseSound.name, transform);
+
         for (int i = 0; i < 30; i++)
         {
             float magic = 0.001054f;
@@ -277,9 +277,9 @@ public class MysteryBox : MonoBehaviour
             yield return null;
         }
 
-        isAnimating = solve;
+        isAnimating = ModuleSolved;
         openedBox = false;
-        if (solve) StartCoroutine("SolveAnim");
+        if (ModuleSolved) StartCoroutine("SolveAnim");
     }
 
     IEnumerator SolveAnim()
@@ -288,7 +288,7 @@ public class MysteryBox : MonoBehaviour
         for (int i = 0; i < 275; i++)
         {
             Box.transform.localPosition += new Vector3(0, 0, 0.0002f);
-            Box.transform.Rotate(10, 0, 0);
+            Box.transform.Rotate(Mathf.Min(10 + i/10, 30), 0, 0);
             yield return null;
         }
         for (int i = 0; i < 25; i++)
@@ -304,6 +304,31 @@ public class MysteryBox : MonoBehaviour
             SolveSprite.transform.localPosition += new Vector3(0, 0.0023f / 30, 0);
             yield return null;
         }
+    }
+
+    IEnumerator Strike()
+    {
+        weaponAvailable = false;
+        AudioClip audio = new AudioClip();
+        if (Rnd.Range(0, 10) == 0) audio = StrikeSounds[0];
+        else
+        {
+            if (Rnd.Range(0, 5) == 0) audio = StrikeSounds[1];
+            else audio = StrikeSounds[Rnd.Range(2, 6)];
+        }
+        Audio.PlaySoundAtTransform(audio.name, transform);
+        yield return new WaitForSeconds(audio.length);
+
+        GetComponent<KMBombModule>().HandleStrike();
+        boxColour = Rnd.Range(0, 10);
+        BoxLight.color = lightColours[boxColour];
+        ColourblindText.text = colourNames[boxColour];
+        goalWeapon = weaponsTable[(int)Math.Floor((x - 1.0) / 10), boxColour];
+        guaranteedRoll = Rnd.Range(6, 9);
+        Log(String.Format("Tried to pick up the {0}, but it wasn't the goal weapon. Strike! Regenerating the module...", rolledWeaponName));
+        Log(String.Format("Mystery Box colour is now {0}, and the goal weapon is the {1}.", colourNames[boxColour], WeaponMaterials[goalWeapon].name));
+
+        StartCoroutine("CloseBox");
     }
 
     IEnumerator CycleWeapon()
