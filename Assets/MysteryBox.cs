@@ -25,6 +25,7 @@ public class MysteryBox : MonoBehaviour
     [SerializeField] AudioClip OpenSound;
     [SerializeField] AudioClip StartupSound;
     [SerializeField] AudioClip SolveSound;
+    [SerializeField] GameObject SolveSprite;
 
     static int ModuleIdCounter = 1;
     int ModuleId;
@@ -135,6 +136,7 @@ public class MysteryBox : MonoBehaviour
 
     void Start()
     {
+        BoxLight.range *= transform.lossyScale.x;
         BoxLight.gameObject.SetActive(false);
         boxColour = Rnd.Range(0, 10);
         BoxLight.color = lightColours[boxColour];
@@ -249,9 +251,9 @@ public class MysteryBox : MonoBehaviour
             yield return null;
         }
         StartCoroutine("CycleWeapon");
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 100; i++)
         {
-            Weapon.transform.localPosition += new Vector3(0, 0, 0.068f / 40);
+            Weapon.transform.localPosition += new Vector3(0, 0, -0.0000001f * i * i + 0.001f);
             yield return null;
         }
     }
@@ -262,11 +264,13 @@ public class MysteryBox : MonoBehaviour
         BoxLight.gameObject.SetActive(false);
         ColourblindText.gameObject.SetActive(false);
         Weapon.gameObject.SetActive(!solve);
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 30; i++)
         {
-            Weapon.transform.localPosition -= new Vector3(0, 0, 0.068f / 20);
+            float magic = 0.001054f;
+            Weapon.transform.localPosition -= new Vector3(0, 0, -magic * Mathf.Sqrt(i) + 5.5f * magic);
             yield return null;
         }
+        Weapon.transform.localPosition = new Vector3(0, 0.0418f, -0.046f);
         for (int i = 0; i < 35; i++)
         {
             Hinge.transform.Rotate(-4, 0, 0);
@@ -281,24 +285,36 @@ public class MysteryBox : MonoBehaviour
     IEnumerator SolveAnim()
     {
         Audio.PlaySoundAtTransform(SolveSound.name, transform);
-        for (int i = 0; i < 300; i++)
+        for (int i = 0; i < 275; i++)
         {
-            Box.gameObject.transform.Rotate(10, 0, 0);
+            Box.transform.localPosition += new Vector3(0, 0, 0.0002f);
+            Box.transform.Rotate(10, 0, 0);
             yield return null;
         }
-        
+        for (int i = 0; i < 25; i++)
+        {
+            Box.transform.localPosition += new Vector3(0, 0, 0.05f);
+            Box.transform.Rotate(10, 0, 0);
+            yield return null;
+        }
         Box.gameObject.SetActive(false);
+        SolveSprite.SetActive(true);
+        for (int i = 0; i < 30; i++)
+        {
+            SolveSprite.transform.localPosition += new Vector3(0, 0.0023f / 30, 0);
+            yield return null;
+        }
     }
 
     IEnumerator CycleWeapon()
     {
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 19; i++)
         {
             int randomWeapon = Rnd.Range(0, WeaponMaterials.Count);
             while (randomWeapon == curWeapon) randomWeapon = Rnd.Range(0, WeaponMaterials.Count);
             curWeapon = randomWeapon;
             WeaponRenderer.material = WeaponMaterials[curWeapon];
-            yield return new WaitForSeconds(0.33f);
+            yield return new WaitForSeconds(Math.Min(0.5f, 0.02f * i));
         }
         RollWeapon();
     }
