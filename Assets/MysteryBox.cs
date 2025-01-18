@@ -339,7 +339,7 @@ public class MysteryBox : MonoBehaviour
                 if (Command == "rollfocus")
                 {
                     while (!weaponAvailable) yield return null;
-                    yield return new WaitForSeconds(1);
+                    yield return new WaitForSeconds(2);
                 }
                 break;
             case "weapon":
