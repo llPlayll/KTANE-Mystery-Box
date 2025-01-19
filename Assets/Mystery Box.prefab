@@ -526,6 +526,7 @@ GameObject:
   - component: {fileID: 33667806590371374}
   - component: {fileID: 23219929520427584}
   - component: {fileID: 114362825312973198}
+  - component: {fileID: 114249229650141638}
   m_Layer: 0
   m_Name: HL
   m_TagString: Untagged
@@ -2543,6 +2544,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShaderNames:
   - Standard
+--- !u!114 &114249229650141638
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1742258958042320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Outline
 --- !u!114 &114270340379078188
 MonoBehaviour:
   m_ObjectHideFlags: 1

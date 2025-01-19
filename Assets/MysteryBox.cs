@@ -231,6 +231,7 @@ public class MysteryBox : MonoBehaviour
             if (rolledWeaponName == "357 Magnum" || rolledWeaponName == "410 Ironhide") rolledWeaponName = "." + rolledWeaponName;
             Log(String.Format("Rolled the {0}. {1}", rolledWeaponName, curWeapon == goalWeapon ? "This is the goal weapon, you should pick it up to solve the module." : "This is not the goal weapon, you should reroll it."));
         }
+        StartCoroutine("WaitThenClose");
     }
 
     void Log(string arg)
@@ -266,15 +267,15 @@ public class MysteryBox : MonoBehaviour
         BoxLight.gameObject.SetActive(false);
         ColourblindText.gameObject.SetActive(false);
         Weapon.gameObject.SetActive(!ModuleSolved);
-        Audio.PlaySoundAtTransform(CloseSound.name, transform);
 
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 50; i++)
         {
-            float magic = 0.001054f;
-            Weapon.transform.localPosition -= new Vector3(0, 0, -magic * Mathf.Sqrt(i) + 5.5f * magic);
+            float magic = 0.00122f;
+            Weapon.transform.localPosition -= new Vector3(0, 0, (magic * i + magic) * (magic * i + magic));
             yield return null;
         }
         Weapon.transform.localPosition = new Vector3(0, 0.0418f, -0.046f);
+        Audio.PlaySoundAtTransform(CloseSound.name, transform);
         for (int i = 0; i < 35; i++)
         {
             Hinge.transform.Rotate(-4, 0, 0);
@@ -283,11 +284,13 @@ public class MysteryBox : MonoBehaviour
 
         isAnimating = ModuleSolved;
         openedBox = false;
+        weaponAvailable = false;
         if (ModuleSolved) StartCoroutine("SolveAnim");
     }
 
     IEnumerator SolveAnim()
     {
+        yield return new WaitForSeconds(0.5f);
         Audio.PlaySoundAtTransform(SolveSound.name, transform);
         for (int i = 0; i < 275; i++)
         {
@@ -346,6 +349,18 @@ public class MysteryBox : MonoBehaviour
             yield return new WaitForSeconds(Math.Min(0.5f, 0.02f * i));
         }
         RollWeapon();
+    }
+
+    IEnumerator WaitThenClose()
+    {
+        yield return new WaitForSeconds(2);
+        for (int i = 0; i < 300; i++)
+        {
+            if (isAnimating) break;
+            Weapon.transform.localPosition -= new Vector3(0, 0, 0.00004f);
+            yield return null;
+        }
+        if (!isAnimating && openedBox) yield return CloseBox();
     }
 
 #pragma warning disable 414
