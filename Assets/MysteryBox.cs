@@ -19,7 +19,6 @@ public class MysteryBox : MonoBehaviour
     [SerializeField] TextMesh ColourblindText;
     [SerializeField] TextMesh WeaponText;
     [SerializeField] GameObject Weapon;
-    [SerializeField] GameObject WeaponHL;
     [SerializeField] MeshRenderer WeaponRenderer;
     [SerializeField] List<Material> WeaponMaterials;
     [SerializeField] List<Material> WonderWeaponMaterials;
@@ -77,6 +76,7 @@ public class MysteryBox : MonoBehaviour
     int guaranteedRoll = 0;
     bool isAnimating;
     bool weaponAvailable;
+    bool highlighting;
 
     void Awake()
     {
@@ -84,7 +84,7 @@ public class MysteryBox : MonoBehaviour
         GetComponent<KMBombModule>().OnActivate += delegate () { Audio.PlaySoundAtTransform(StartupSound.name, transform); };
         Box.OnInteract += delegate () { OnBoxInteract(); return false; };
         Weapon.GetComponent<KMSelectable>().OnHighlight += delegate () { OnWeaponHL(); };
-        Weapon.GetComponent<KMSelectable>().OnHighlightEnded += delegate () { WeaponText.gameObject.SetActive(false); };
+        Weapon.GetComponent<KMSelectable>().OnHighlightEnded += delegate () { WeaponText.gameObject.SetActive(false); highlighting = false; };
         Weapon.GetComponent<KMSelectable>().OnInteract += delegate () { OnWeaponInteract(); return false; };
     }
     
@@ -103,9 +103,13 @@ public class MysteryBox : MonoBehaviour
 
     void OnWeaponHL()
     {
-        if (ModuleSolved || isAnimating || !weaponAvailable) return;
-        WeaponText.gameObject.SetActive(true);
-        WeaponText.text = rolledWeaponName;
+        if (ModuleSolved) return;
+        highlighting = true;
+    }
+
+    void Update()
+    {
+        WeaponText.gameObject.SetActive(highlighting && weaponAvailable);
     }
 
     void OnWeaponInteract()
@@ -208,7 +212,6 @@ public class MysteryBox : MonoBehaviour
         rolls++;
         weaponAvailable = true;
         isAnimating = false;
-        WeaponHL.SetActive(true);
         if (Rnd.Range(0, 100) == 0)
         {
             int wonderIdx = Rnd.Range(0, 5);
@@ -231,6 +234,7 @@ public class MysteryBox : MonoBehaviour
             if (rolledWeaponName == "357 Magnum" || rolledWeaponName == "410 Ironhide") rolledWeaponName = "." + rolledWeaponName;
             Log(String.Format("Rolled the {0}. {1}", rolledWeaponName, curWeapon == goalWeapon ? "This is the goal weapon, you should pick it up to solve the module." : "This is not the goal weapon, you should reroll it."));
         }
+        WeaponText.text = rolledWeaponName;
         StartCoroutine("WaitThenClose");
     }
 
@@ -242,7 +246,6 @@ public class MysteryBox : MonoBehaviour
     IEnumerator OpenBox()
     {
         isAnimating = true;
-        WeaponHL.SetActive(false);
         BoxLight.gameObject.SetActive(true);
         ColourblindText.gameObject.SetActive(Colourblind.ColorblindModeActive);
         Audio.PlaySoundAtTransform(MusicBox.name, transform);
@@ -263,7 +266,6 @@ public class MysteryBox : MonoBehaviour
     IEnumerator CloseBox()
     {
         isAnimating = true;
-        WeaponHL.SetActive(false);
         BoxLight.gameObject.SetActive(false);
         ColourblindText.gameObject.SetActive(false);
         Weapon.gameObject.SetActive(!ModuleSolved);
