@@ -320,6 +320,7 @@ public class MysteryBox : MonoBehaviour
     {
         StopCoroutine("WaitThenClose");
         weaponAvailable = false;
+        isAnimating = true;
         AudioClip audio = new AudioClip();
         if (Rnd.Range(0, 10) == 0) audio = StrikeSounds[0];
         else
