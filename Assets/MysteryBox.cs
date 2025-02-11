@@ -77,6 +77,7 @@ public class MysteryBox : MonoBehaviour
     bool isAnimating;
     bool weaponAvailable;
     bool highlighting;
+    bool TPAutoName;
 
     void Awake()
     {
@@ -84,7 +85,7 @@ public class MysteryBox : MonoBehaviour
         GetComponent<KMBombModule>().OnActivate += delegate () { Audio.PlaySoundAtTransform(StartupSound.name, transform); };
         Box.OnInteract += delegate () { OnBoxInteract(); return false; };
         Weapon.GetComponent<KMSelectable>().OnHighlight += delegate () { OnWeaponHL(); };
-        Weapon.GetComponent<KMSelectable>().OnHighlightEnded += delegate () { WeaponText.gameObject.SetActive(false); highlighting = false; };
+        Weapon.GetComponent<KMSelectable>().OnHighlightEnded += delegate () { WeaponText.gameObject.SetActive(TPAutoName); highlighting = TPAutoName; };
         Weapon.GetComponent<KMSelectable>().OnInteract += delegate () { OnWeaponInteract(); return false; };
     }
     
@@ -109,7 +110,7 @@ public class MysteryBox : MonoBehaviour
 
     void Update()
     {
-        WeaponText.gameObject.SetActive(highlighting && weaponAvailable);
+        WeaponText.gameObject.SetActive((highlighting || TPAutoName) && weaponAvailable);
     }
 
     void OnWeaponInteract()
@@ -317,6 +318,7 @@ public class MysteryBox : MonoBehaviour
 
     IEnumerator Strike()
     {
+        StopCoroutine("WaitThenClose");
         weaponAvailable = false;
         AudioClip audio = new AudioClip();
         if (Rnd.Range(0, 10) == 0) audio = StrikeSounds[0];
@@ -355,7 +357,7 @@ public class MysteryBox : MonoBehaviour
 
     IEnumerator WaitThenClose()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(TwitchPlaysActive ? 10 : 2);
         for (int i = 0; i < 300; i++)
         {
             if (isAnimating) break;
@@ -366,7 +368,8 @@ public class MysteryBox : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use <!{0} roll> to roll/reroll the weapon. Use <!{0} rollfocus> to focus on the module while rolling. Use <!{0} weapon> to pick the weapon up. Use <!{0} name> to shortly display the weapon's name. Use <!{0} cb> to toggle colourblind mode.";
+    private readonly string TwitchHelpMessage = @"Use <!{0} roll> to roll/reroll the weapon (you get 10 seconds to make a decision on TP instead of the normal 2). Use <!{0} rollfocus> to focus on the module while rolling. Use <!{0} weapon> to pick the weapon up. Use <!{0} name> to shortly display the weapon's name. Use <!{0} autoname> to enable auto-name mode, in which the weapon's name is displayed at all times. Use <!{0} cb> to toggle colourblind mode.";
+    private bool TwitchPlaysActive = false;
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string Command)
@@ -403,11 +406,15 @@ public class MysteryBox : MonoBehaviour
                     yield return "sendtochatmessage You have to roll the weapon first!";
                     break;
                 }
-                yield return null;
+                while (isAnimating) yield return null;
                 Weapon.GetComponent<KMSelectable>().OnHighlight();
                 yield return new WaitForSeconds(3);
                 Weapon.GetComponent<KMSelectable>().OnHighlightEnded();
                 yield return null;
+                break;
+            case "autoname":
+                TPAutoName = !TPAutoName;
+                yield return $"sendtochatmessage Toggled auto-name mode {(TPAutoName ? "on" : "off")}.";
                 break;
             case "cb":
                 yield return null;
